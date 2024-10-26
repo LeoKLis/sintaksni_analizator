@@ -1,7 +1,9 @@
 #include<iostream>
+#include "parserPravila.h"
 
 using namespace std;
 
 int main(){
-    cout << "Hello sintaksni analizator" << endl;
+    ParserPravila pp;
+    pp.printPravila();
 }
