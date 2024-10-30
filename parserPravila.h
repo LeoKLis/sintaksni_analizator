@@ -15,6 +15,7 @@ public:
     vector<string> zavrsniZnakovi;
     vector<string> sinkronizacijskiZnakovi;
     map<string, vector<vector<string>>> produkcije;
+
     ParserPravila();
     void printPravila();
 };
