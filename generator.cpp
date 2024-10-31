@@ -7,7 +7,6 @@ using namespace std;
 int main()
 {
     ParserPravila pp;
-    // pp.printPravila();
 
     NFA nfa;
     nfa.build(pp.nezavrsniZnakovi, pp.zavrsniZnakovi, pp.produkcije);

@@ -18,26 +18,34 @@ struct StateNFA {
     vector<string> prodRightSide;
     int dotIndex;
 
+    vector<string> starts;
+
     int normalTransition;
     vector<int> epsilonTransitions;
 };
 
+struct SWTable {
+    vector<vector<int>> startsWithChar;
+    map<string, int> charIndex;
+    vector<int> emptyChars;
+};
+
 class NFA {
 private:
-    void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
-    bool isFinal(vector<string> finalChars, string symbol);
-
-public:
-    // NFA_STRUCTURE nfaStructure;
     vector<StateNFA> structure;
     map<string, int> existingStates;
+    SWTable swtable;
 
-    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex); // Dodano!
+    void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
+    template<typename T> bool exists(vector<T> array, T symbol);
+    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts); // Dodano!
     int createState(string stateName);
     void addTransition(int from, int to, string znak);
     string stringifyStateProduction(StateNFA state);
-    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex);
+    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts);
+public:
     void build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
+    // Prvo se isprinta indeks stanja, pa pridruzena produkcija, pa ZAPOCINJE znakovi i onda prijelazi (jedan obicni i ostali epsilon prijelazi)
     void printNFA();
 };
 
