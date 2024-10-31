@@ -1,45 +1,44 @@
 #ifndef NFA_H
 #define NFA_H
 
-#include <bits/stdc++.h>
+#include <algorithm>
 #include <iostream>
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
 #define EPSILON "epsilon"
+// #define NFA_STRUCTURE vector<map<string, vector<int>>>
 
 using namespace std;
 
-#define NFA_STRUCTURE vector<map<string, vector<int>>>
+struct StateNFA {
+    string prodLeftSide;
+
+    vector<string> prodRightSide;
+    int dotIndex;
+
+    int normalTransition;
+    vector<int> epsilonTransitions;
+};
 
 class NFA {
 private:
-    bool prefiksirano;
-    set<int> currentStates;
-    set<int> resolveEpsilonEnviroment(set<int> current);
+    void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
+    bool isFinal(vector<string> finalChars, string symbol);
 
 public:
-    string name;
-    NFA_STRUCTURE nfaStructure;
-    map<int, vector<string>> acceptStatesMap;
+    // NFA_STRUCTURE nfaStructure;
+    vector<StateNFA> structure;
+    map<string, int> existingStates;
 
-    NFA();
-    NFA(string nfaName, NFA_STRUCTURE stateTransitions, map<int, vector<string>> acceptStatesMap);
-    int isFinished();
-    void readChar(char symbol);
-    vector<string> getAction();
-
-    int addState(){     //Moramo dodat ovo fakat je lakse testirat
-        map<string, vector<int>> mapa;
-        nfaStructure.push_back(mapa);
-    };
-    void addTransition(int from, int to, string znak){
-        ((nfaStructure.at(from)).at(znak)).push_back(to);
-    };
-
-    void restart();
+    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex); // Dodano!
+    int createState(string stateName);
+    void addTransition(int from, int to, string znak);
+    string stringifyStateProduction(StateNFA state);
+    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex);
+    void build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
+    void printNFA();
 };
 
 #endif

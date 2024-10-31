@@ -1,27 +1,23 @@
 #ifndef rulesToNfa_H
 #define rulesToNfa_H
 
-#include "nfa.h"
-#include "nfa.cpp"
-#include<iostream>
-#include<string>
-#include<vector>
-#include<map>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "parserPravila.h"
-#include "parserPravila.cpp"
+#include "nfa.h"
 
 using namespace std;
 
-class rulesToNfa{
+class RulesToNfa {
 private:
     NFA nfa;
     map<string, int> stateNames;
-    //map<int, vector<string>> stateNames ??
+    // map<int, vector<string>> stateNames ??
 public:
-    rulesToNfa(ParserPravila pp)
-
-
+    RulesToNfa(ParserPravila pp);
 };
 
 #endif

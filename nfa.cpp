@@ -1,109 +1,126 @@
 #include "nfa.h"
 
-NFA::NFA()
+int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex)
 {
-    prefiksirano = false;
-    currentStates.insert(0);
-    set<int> newStates = resolveEpsilonEnviroment(currentStates);
-    currentStates.insert(newStates.begin(), newStates.end());
-}
-
-NFA::NFA(string nfaName, NFA_STRUCTURE stateTransitions,
-    map<int, vector<string>> acceptStatesMap)
-{
-    name = nfaName;
-    nfaStructure = stateTransitions;
-    this->acceptStatesMap = acceptStatesMap;
-    prefiksirano = false;
-    currentStates.insert(0);
-    set<int> newStates = resolveEpsilonEnviroment(currentStates);
-    currentStates.insert(newStates.begin(), newStates.end());
-}
-
-int NFA::isFinished()
-{ // 0 - nema finalnih, ali ima stanja; 1 - ima i finalnih i mozda obicnih; 2
-    // - nema stanja
-    set<int> newStates = resolveEpsilonEnviroment(currentStates);
-    currentStates.insert(newStates.begin(), newStates.end());
-    if (currentStates.size() == 0) {
-        return 2;
+    // map<string, vector<int>> mapa;
+    // nfaStructure.push_back(mapa);
+    StateNFA state;
+    state.prodLeftSide = prodLeftSide;
+    state.normalTransition = -1;
+    if (prodRightSide.size() == 1 && prodRightSide[0] == "$") {
+        state.dotIndex = 0;
+    } else {
+        state.prodRightSide = prodRightSide;
+        state.dotIndex = dotIndex;
     }
-    if (currentStates.size() > 0) {
-        for (auto i : currentStates) {
-            if (acceptStatesMap.find(i) != acceptStatesMap.end())
-                return 1;
+
+    structure.push_back(state);
+    return structure.size() - 1;
+}
+
+int NFA::createState(string stateName)
+{
+    StateNFA state;
+    state.prodLeftSide = stateName;
+    state.normalTransition = -1;
+    state.dotIndex = -1;
+
+    structure.push_back(state);
+    return structure.size() - 1;
+}
+
+void NFA::addTransition(int from, int to, string znak)
+{
+    // nfaStructure.at(from).at(znak).push_back(to);
+    int dotIndex = structure[from].dotIndex;
+    if (znak == EPSILON) {
+        structure[from].epsilonTransitions.push_back(to);
+    } else if (dotIndex < structure[from].prodRightSide.size() && znak == structure[from].prodRightSide[dotIndex]) {
+        structure[from].normalTransition = to;
+    } else {
+        cout << "Greska kod dodavanja tranzicije (znak == " << znak << ", tranZnak == " << structure[from].prodRightSide[dotIndex] << ")";
+    }
+}
+
+string NFA::stringifyStateProduction(StateNFA state)
+{
+    return stringifyProduction(state.prodLeftSide, state.prodRightSide, state.dotIndex);
+}
+
+string NFA::stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex)
+{
+    string output = "";
+    output.append(prodLeftSide + " -> ");
+    if(prodRightSide.size() == 1 && prodRightSide[0] == "$"){
+        output.append("0");
+        return output;
+    }
+    bool wroteZero = false;
+    for (int i = 0; i < prodRightSide.size(); i++) {
+        if (i == dotIndex) {
+            output.append("0 " + prodRightSide[i] + " ");
+            wroteZero = true;
+            continue;
         }
+        output.append(prodRightSide[i] + " ");
     }
-    return 0;
+    if (!wroteZero && dotIndex != -1) {
+        output.append("0 ");
+    }
+    output.pop_back();
+    return output;
 }
 
-set<int> NFA::resolveEpsilonEnviroment(set<int> current)
+bool NFA::isFinal(vector<string> finalChars, string symbol)
 {
-    if (current.empty())
-        return current;
+    return find(finalChars.cbegin(), finalChars.cend(), symbol) != finalChars.end();
+}
 
-    set<int> nextStates;
-    for (auto i : current) {
-        if (nfaStructure[i].count(EPSILON)) {
-            for (auto j : nfaStructure[i][EPSILON])
-                nextStates.insert(j);
+void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions)
+{
+    string initialState = nonFinalChars[0];
+    int nul = createState("nulto");
+    int init = createState("inicijalno", vector<string> { initialState }, 0);
+    addTransition(nul, init, EPSILON);
+    recursiveBuild(init, nonFinalChars, finalChars, productions);
+}
+
+void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions)
+{
+    StateNFA state = structure[stateIndex];
+    int dotIndex = state.dotIndex;
+    if (state.prodRightSide.size() <= dotIndex) {
+        return;
+    }
+    string signOnIndex = state.prodRightSide[dotIndex];
+    int nonEpsStateIndex = createState(state.prodLeftSide, state.prodRightSide, state.dotIndex + 1);
+    addTransition(stateIndex, nonEpsStateIndex, signOnIndex);
+    recursiveBuild(nonEpsStateIndex, nonFinalChars, finalChars, productions);
+    if (isFinal(finalChars, signOnIndex)) {
+        return;
+    }
+    for (auto it : productions[signOnIndex]) {
+        string prod = stringifyProduction(signOnIndex, it, 0);
+        if (existingStates.count(prod) != 0) {
+            addTransition(stateIndex, existingStates[prod], EPSILON);
+            continue;
         }
+        int epsStateIndex = createState(signOnIndex, it, 0);
+        string epsStateProduction = stringifyStateProduction(structure[epsStateIndex]);
+        existingStates.insert({ epsStateProduction, epsStateIndex });
+        addTransition(stateIndex, epsStateIndex, EPSILON);
+        recursiveBuild(epsStateIndex, nonFinalChars, finalChars, productions);
     }
-
-    set<int> more_next_states = resolveEpsilonEnviroment(nextStates);
-
-    for (auto i : more_next_states)
-        nextStates.insert(i);
-    return nextStates;
 }
 
-void NFA::readChar(char symbol)
+void NFA::printNFA()
 {
-    string znak = string { symbol };
-    if (symbol == ' ') {
-        znak = "\\_";
-    } else if (symbol == '\t') {
-        znak = "\\t";
-    } else if (symbol == '\n') {
-        znak = "\\n";
-    }
-    // Epsilon okruzenje
-    set<int> newStates = resolveEpsilonEnviroment(currentStates);
-    currentStates.insert(newStates.begin(), newStates.end());
-
-    set<int> newCurrent;
-    for (auto i : currentStates) {
-        if (nfaStructure[i].count(znak)) {
-            for (auto i : nfaStructure[i][znak])
-                newCurrent.insert(i);
+    int count = 0;
+    for (auto it : structure) {
+        cout << count++ << ": " << stringifyStateProduction(it) << " ==> normal: " << it.normalTransition << ", epsilon: ";
+        for (auto se : it.epsilonTransitions) {
+            cout << se << " ";
         }
+        cout << endl;
     }
-    currentStates.clear();
-    currentStates.insert(newCurrent.begin(), newCurrent.end());
-}
-
-void NFA::restart()
-{
-    currentStates.clear();
-    currentStates.insert(0);
-    set<int> newStates = resolveEpsilonEnviroment(currentStates);
-    currentStates.insert(newStates.begin(), newStates.end());
-}
-
-vector<string> NFA::getAction()
-{
-    set<int> newStates = resolveEpsilonEnviroment(currentStates);
-    currentStates.insert(newStates.begin(), newStates.end());
-
-    vector<int> copy_current;
-    for (auto i : currentStates) {
-        if (acceptStatesMap.count(i))
-            copy_current.push_back(i);
-    }
-
-    sort(copy_current.begin(), copy_current.end());
-
-    if (copy_current.empty())
-        return vector<string> {};
-    return acceptStatesMap[copy_current[0]];
 }

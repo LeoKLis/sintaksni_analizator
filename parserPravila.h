@@ -1,10 +1,10 @@
 #ifndef PARSER_PRAVILA_H
 #define PARSER_PRAVILA_H
 
-#include<iostream>
-#include<string>
-#include<vector>
-#include<map>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
 
 using namespace std;
 

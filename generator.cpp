@@ -1,11 +1,15 @@
-#include<iostream>
+#include "nfa.h"
 #include "parserPravila.h"
-
-#include "parserPravila.cpp"
+#include <iostream>
 
 using namespace std;
 
-int main(){
+int main()
+{
     ParserPravila pp;
-    pp.printPravila();
+    // pp.printPravila();
+
+    NFA nfa;
+    nfa.build(pp.nezavrsniZnakovi, pp.zavrsniZnakovi, pp.produkcije);
+    nfa.printNFA();
 }

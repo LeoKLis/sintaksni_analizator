@@ -7,7 +7,6 @@ ParserPravila::ParserPravila()
 
     // nezavrsni znakovi gramatike
     getline(cin, line);
-    line.pop_back();
     line = line.substr(line.find_first_of(' ') + 1);
     while ((razmakIndex = line.find_first_of(' ')) != string::npos) {
         nezavrsniZnakovi.push_back(line.substr(0, razmakIndex));
@@ -18,7 +17,6 @@ ParserPravila::ParserPravila()
     // zavrsni znakovi gramatike
     getline(cin, line);
     line = line.substr(line.find_first_of(' ') + 1);
-    line.pop_back();
     while ((razmakIndex = line.find_first_of(' ')) != string::npos) {
         zavrsniZnakovi.push_back(line.substr(0, razmakIndex));
         line = line.substr(razmakIndex + 1);
@@ -28,7 +26,6 @@ ParserPravila::ParserPravila()
     // sinkronizacijski znakovi gramatike
     getline(cin, line);
     line = line.substr(line.find_first_of(' ') + 1);
-    line.pop_back();
     while ((razmakIndex = line.find_first_of(' ')) != string::npos) {
         sinkronizacijskiZnakovi.push_back(line.substr(0, razmakIndex));
         line = line.substr(razmakIndex + 1);
@@ -37,7 +34,6 @@ ParserPravila::ParserPravila()
 
     string trenutnaProdukcija;
     while (getline(cin, line)) {
-        line.pop_back();
         if (line[0] != ' ') {
             trenutnaProdukcija = line;
             continue;
