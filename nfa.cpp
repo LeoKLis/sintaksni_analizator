@@ -1,6 +1,6 @@
 #include "nfa.h"
 
-int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts)
+int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts)
 {
     // map<string, vector<int>> mapa;
     // nfaStructure.push_back(mapa);
@@ -47,7 +47,7 @@ string NFA::stringifyStateProduction(StateNFA state)
     return stringifyProduction(state.prodLeftSide, state.prodRightSide, state.dotIndex, state.starts);
 }
 
-string NFA::stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts)
+string NFA::stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts)
 {
     string output = "";
     output.append(prodLeftSide + " -> ");
@@ -67,6 +67,7 @@ string NFA::stringifyProduction(string prodLeftSide, vector<string> prodRightSid
     if (!wroteZero && dotIndex != -1) {
         output.append("0 ");
     }
+    // output.pop_back();
     output.append("{ ");
     for(auto it : starts){
         output.append(it + " ");
@@ -135,7 +136,7 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
             if (startsWithChar[i][j] == 1) {
                 for (int k = 0; k < numChars; k++) {
                     if (startsWithChar[j][k] == 1) {
-                        startsWithChar[i][k] = 2;
+                        startsWithChar[i][k] = 1;
                     }
                 }
             }
@@ -146,8 +147,15 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
     swtable.charIndex = charIndex;
     swtable.emptyChars = emptyChars;
 
+    // for(auto it : startsWithChar){
+    //     for(auto se : it){
+    //         cout << se << " ";
+    //     }
+    //     cout << endl;
+    // }
+
     string initialState = nonFinalChars[0];
-    int init = createState("inicijalno", vector<string> { initialState }, 0, vector<string> { "$" });
+    int init = createState("inicijalno", vector<string> { initialState }, 0, set<string> { "$" });
     recursiveBuild(init, nonFinalChars, finalChars, productions);
 }
 
@@ -165,7 +173,7 @@ void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<st
     if (exists(finalChars, signOnIndex)) {
         return;
     }
-    vector<string> starts;
+    set<string> starts;
     if (dotIndex + 1 >= state.prodRightSide.size()) {
         starts = state.starts;
     } else {
@@ -176,14 +184,16 @@ void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<st
             idx = swtable.charIndex[ch];
             for (int j = 0; j < finalChars.size(); j++) {
                 if (swtable.startsWithChar[idx][j + nonFinalChars.size()] != 0) {
-                    starts.push_back(finalChars[j]);
+                    starts.insert(finalChars[j]);
                 }
             }
             if (exists(swtable.emptyChars, idx))
                 hadEmpty = true;
+            if(!exists(swtable.emptyChars, idx))
+                break;
         }
         if (hadEmpty)
-            starts.push_back("$");
+            starts.insert("$");
         if (starts.empty())
             starts = state.starts;
     }
@@ -203,6 +213,7 @@ void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<st
 
 void NFA::printNFA()
 {
+    cout << structure.size() << endl;
     int count = 0;
     for (auto it : structure) {
         cout << count++ << ": " << stringifyStateProduction(it) << " ==> normal: " << it.normalTransition << ", epsilon: ";

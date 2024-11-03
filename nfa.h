@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -18,7 +19,7 @@ struct StateNFA {
     vector<string> prodRightSide;
     int dotIndex;
 
-    vector<string> starts;
+    set<string> starts;
 
     int normalTransition;
     vector<int> epsilonTransitions;
@@ -37,12 +38,14 @@ private:
     SWTable swtable;
 
     void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
-    template<typename T> bool exists(vector<T> array, T symbol);
-    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts); // Dodano!
+    template <typename T>
+    bool exists(vector<T> array, T symbol);
+    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts); // Dodano!
     int createState(string stateName);
     void addTransition(int from, int to, string znak);
     string stringifyStateProduction(StateNFA state);
-    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts);
+    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
+
 public:
     void build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     // Prvo se isprinta indeks stanja, pa pridruzena produkcija, pa ZAPOCINJE znakovi i onda prijelazi (jedan obicni i ostali epsilon prijelazi)
