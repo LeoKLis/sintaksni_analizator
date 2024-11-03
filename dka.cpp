@@ -3,7 +3,7 @@
 using namespace std;
 
 
-static void DKA::combineStates(StateDFA base, StateDFA added){
+void DKA::combineStates(StateDFA base, StateDFA added){
 
     for(int i=0; i<added.dotIndex.size(); i++){
         base.prodLeftSide.push_back(added.prodLeftSide);

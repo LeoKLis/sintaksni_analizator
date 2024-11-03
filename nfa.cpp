@@ -4,7 +4,7 @@ int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotI
 {
     // map<string, vector<int>> mapa;
     // nfaStructure.push_back(mapa);
-    StateEpsilonNFA state;
+    StateNFA state;
     state.prodLeftSide = prodLeftSide;
     state.normalTransition = -1;
     if (prodRightSide.size() == 1 && prodRightSide[0] == "$") {
@@ -20,7 +20,7 @@ int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotI
 
 int NFA::createState(string stateName)
 {
-    StateEpsilonNFA state;
+    StateNFA state;
     state.prodLeftSide = stateName;
     state.normalTransition = -1;
     state.dotIndex = -1;
@@ -42,7 +42,7 @@ void NFA::addTransition(int from, int to, string znak)
     }
 }
 
-string NFA::stringifyStateProduction(StateEpsilonNFA state)
+string NFA::stringifyStateProduction(StateNFA state)
 {
     return stringifyProduction(state.prodLeftSide, state.prodRightSide, state.dotIndex, state.starts);
 }
@@ -161,7 +161,7 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
 
 void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions)
 {
-    StateEpsilonNFA state = structure[stateIndex];
+    StateNFA state = structure[stateIndex];
     int dotIndex = state.dotIndex;
     if (state.prodRightSide.size() <= dotIndex) {
         return;
@@ -246,17 +246,16 @@ set<int> NFA::resolveEpsilonEnviroment(set<int> current)
 
 string NFA::normalTransitionSymbol(int stateIndex){
 
-    StateEpsilonNFA state = structure[stateIndex];
+    StateNFA state = structure[stateIndex];
     return normalTransitionSymbol(state);
 }
 
-
-string NFA::normalTransitionSymbol(StateEpsilonNFA state){
+string NFA::normalTransitionSymbol(StateNFA state){
 
     string simbol = "ovo je kraj cijelog niza, svaka cast";
     if(state.dotIndex>state.prodRightSide.size())
         return simbol;
 
-    simbol = state.prodLeftSide.at(dotIndex);
+    simbol = state.prodLeftSide.at(state.dotIndex);
     return simbol;
 }
