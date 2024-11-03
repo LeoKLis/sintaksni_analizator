@@ -32,8 +32,9 @@ class DKA {
 private:
     vector<StateDFA> structure;
 public:
-    static void combineStates(StateDFA base, StateDFA added);
+    void combineStates(StateDFA base, StateDFA added);
     DKA(NFA nfa);
+    void print();
 
 };
 

@@ -1,5 +1,13 @@
 #include "nfa.h"
 
+int NFA::transition(int from, int to, string simbol){
+
+    if (simbol == EPSILON) {
+        structure[from].epsilonTransitions.push_back(to);
+    } else
+        structure[from].normalTransition = to;
+}
+
 int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts)
 {
     // map<string, vector<int>> mapa;
@@ -246,6 +254,6 @@ string NFA::normalTransitionSymbol(StateEpsilonNFA state){
     if(state.dotIndex>state.prodRightSide.size())
         return simbol;
 
-    simbol = state.prodLeftSide.at(dotIndex);
+    simbol = state.prodLeftSide.at(state.dotIndex);
     return simbol;
 }

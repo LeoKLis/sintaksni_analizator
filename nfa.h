@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 #define EPSILON "epsilon"
 // #define NFA_STRUCTURE vector<map<string, vector<int>>>
@@ -32,24 +33,29 @@ struct SWTable {
 
 class NFA {
 private:
-    vector<StateEpsilonNFA> structure;
+    //vector<StateEpsilonNFA> structure;
     map<string, int> existingStates;
     SWTable swtable;
 
     void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     template<typename T> bool exists(vector<T> array, T symbol);
-    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts); // Dodano!
-    int createState(string stateName);
-    void addTransition(int from, int to, string znak);
+
     string stringifyStateProduction(StateEpsilonNFA state);
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts);
 public:
+    vector<StateEpsilonNFA> structure; //privremeno
+    void addTransition(int from, int to, string znak);
+    int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts); // Dodano!
+    int createState(string stateName);
+
     void build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     // Prvo se isprinta indeks stanja, pa pridruzena produkcija, pa ZAPOCINJE znakovi i onda prijelazi (jedan obicni i ostali epsilon prijelazi)
     void printNFA();
-    set<int> NFA::resolveEpsilonEnviroment(set<int> current)
+    set<int> resolveEpsilonEnviroment(set<int> current);
     string normalTransitionSymbol(int stateIndex);
     string normalTransitionSymbol(StateEpsilonNFA state);
+
+    int transition(int from, int to, string simbol);
 };
 
 #endif
