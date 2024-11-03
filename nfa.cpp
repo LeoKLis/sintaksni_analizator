@@ -4,7 +4,7 @@ int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotI
 {
     // map<string, vector<int>> mapa;
     // nfaStructure.push_back(mapa);
-    StateNFA state;
+    StateEpsilonNFA state;
     state.prodLeftSide = prodLeftSide;
     state.normalTransition = -1;
     if (prodRightSide.size() == 1 && prodRightSide[0] == "$") {
@@ -20,7 +20,7 @@ int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotI
 
 int NFA::createState(string stateName)
 {
-    StateNFA state;
+    StateEpsilonNFA state;
     state.prodLeftSide = stateName;
     state.normalTransition = -1;
     state.dotIndex = -1;
@@ -42,7 +42,7 @@ void NFA::addTransition(int from, int to, string znak)
     }
 }
 
-string NFA::stringifyStateProduction(StateNFA state)
+string NFA::stringifyStateProduction(StateEpsilonNFA state)
 {
     return stringifyProduction(state.prodLeftSide, state.prodRightSide, state.dotIndex, state.starts);
 }
@@ -153,7 +153,7 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
 
 void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions)
 {
-    StateNFA state = structure[stateIndex];
+    StateEpsilonNFA state = structure[stateIndex];
     int dotIndex = state.dotIndex;
     if (state.prodRightSide.size() <= dotIndex) {
         return;
@@ -211,4 +211,41 @@ void NFA::printNFA()
         }
         cout << endl;
     }
+}
+
+set<int> NFA::resolveEpsilonEnviroment(set<int> current)
+{
+    if (current.empty())
+        return current;
+
+    set<int> nextStates;
+    for (auto i : current) {
+        if (structure[i].epsilonTransitions.size()>0) {
+            for (auto j : structure[i].epsilonTransitions)
+                nextStates.insert(j);
+        }
+    }
+
+    set<int> more_next_states = resolveEpsilonEnviroment(nextStates);
+
+    for (auto i : more_next_states)
+        nextStates.insert(i);
+    return nextStates;
+}
+
+string NFA::normalTransitionSymbol(int stateIndex){
+
+    StateEpsilonNFA state = structure[stateIndex];
+    return normalTransitionSymbol(state);
+}
+
+
+string NFA::normalTransitionSymbol(StateEpsilonNFA state){
+
+    string simbol = "ovo je kraj cijelog niza, svaka cast";
+    if(state.dotIndex>state.prodRightSide.size())
+        return simbol;
+
+    simbol = state.prodLeftSide.at(dotIndex);
+    return simbol;
 }

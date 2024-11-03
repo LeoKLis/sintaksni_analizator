@@ -12,7 +12,7 @@
 
 using namespace std;
 
-struct StateNFA {
+struct StateEpsilonNFA {
     string prodLeftSide;
 
     vector<string> prodRightSide;
@@ -32,7 +32,7 @@ struct SWTable {
 
 class NFA {
 private:
-    vector<StateNFA> structure;
+    vector<StateEpsilonNFA> structure;
     map<string, int> existingStates;
     SWTable swtable;
 
@@ -41,12 +41,15 @@ private:
     int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts); // Dodano!
     int createState(string stateName);
     void addTransition(int from, int to, string znak);
-    string stringifyStateProduction(StateNFA state);
+    string stringifyStateProduction(StateEpsilonNFA state);
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, vector<string> starts);
 public:
     void build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     // Prvo se isprinta indeks stanja, pa pridruzena produkcija, pa ZAPOCINJE znakovi i onda prijelazi (jedan obicni i ostali epsilon prijelazi)
     void printNFA();
+    set<int> NFA::resolveEpsilonEnviroment(set<int> current)
+    string normalTransitionSymbol(int stateIndex);
+    string normalTransitionSymbol(StateEpsilonNFA state);
 };
 
 #endif
