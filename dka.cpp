@@ -6,10 +6,14 @@ using namespace std;
 void DKA::combineStates(StateDFA base, StateDFA added){
 
     for(int i=0; i<added.dotIndex.size(); i++){
-        base.prodLeftSide.push_back(added.prodLeftSide);
-        base.starts.push_back(added.starts);
-        base.dotIndex.push_back(added.dotIndex);
-        base.prodRightSide.push_back(added.prodRightSide);
+
+        base.prodLeftSide.push_back(added.prodLeftSide.at(i));
+
+        base.starts.push_back(added.starts.at(i));
+
+        base.dotIndex.push_back(added.dotIndex.at(i));
+
+        base.prodRightSide.push_back(added.prodRightSide.at(i));
     }
 }
 
@@ -20,7 +24,7 @@ DKA::DKA(NFA nfa){
     for(auto state : nfa.structure){ //dodana sva stanja s normalnim tranzicijama, bez epsilon tranzicija
         StateDFA dfa;
         dfa.prodLeftSide.push_back(state.prodLeftSide);
-        dfa.starts.push_back(state.starts);
+        // dfa.starts.insert(state.starts); Umetni set u set ga
         dfa.dotIndex.push_back(state.dotIndex);
         dfa.prodRightSide.push_back(state.prodRightSide);
 
@@ -33,11 +37,11 @@ DKA::DKA(NFA nfa){
 
         structure.push_back(dfa);
 
-        vector<int> stateIndex;
+       // vector<int> stateIndex;
         vector<int> combinedStates;
-        stateIndex.push_back(structure.size()-1);
+       // stateIndex.push_back(structure.size()-1);
         combinedStates.push_back(structure.size()-1);
-        existingStates.insert({combinedStates, stateIndex});
+        existingStates.insert({combinedStates, structure.size()-1});
     }
 
     ///rjesavanje epsilon tranzicija
@@ -45,11 +49,11 @@ DKA::DKA(NFA nfa){
         StateDFA state = structure[i];
         set<int> epsilon;
         epsilon.insert(i);
-        epsilon = nfa.resolveEpsilonEnviroment(epsilon):
+        epsilon = nfa.resolveEpsilonEnviroment(epsilon);
         epsilon.erase(i);
 
         for(auto indexOfNewState : epsilon){
-            StateEpsilonNFA new_state = nfa.structure //stanje u epsilon okruzenju
+            StateNFA new_state = nfa.structure.at(indexOfNewState); //stanje u epsilon okruzenju
 
             if(new_state.normalTransition != -1){ //ako ima normalTransition dalje, dodaj to u orginalno stanje
                 string simbol = nfa.normalTransitionSymbol(new_state);
@@ -61,7 +65,7 @@ DKA::DKA(NFA nfa){
 
     int i,n=0;
 
-    bool new_state_added=true
+    bool new_state_added=true;
     while(new_state_added==true){
         new_state_added=false;
         i = n;
@@ -72,13 +76,13 @@ DKA::DKA(NFA nfa){
             vector<string> transitionSymbol; //ovo ce kasnije state.transitionSymbol = transitionSymbol
             vector<int> transition; // ovo ce kasnije state.transition = transition
 
-            map<string, vector<int>> sortTransitions;
+            map<string, vector<int>> sortedTransitions;
 
             for(int j=0; j<state.transition.size(); j++){ //analiziranje svakog prijelaza stanja State
                 string simbol = state.transitionSymbol.at(j);
                 int nextState = state.transition.at(j);
                 if(sortedTransitions.find(simbol) != sortedTransitions.end())
-                    (sortedTransitions.at(simbol)).push_back(new_state);
+                    (sortedTransitions.at(simbol)).push_back(nextState);
                 else{
                     vector<int> vec;
                     vec.push_back(nextState);
@@ -86,9 +90,12 @@ DKA::DKA(NFA nfa){
                 }
             }
 
-            for(auto simbol_vektorNovihStanja : sortTransitions){
+            for(auto simbol_vektorNovihStanja : sortedTransitions){
                 string simbol =simbol_vektorNovihStanja.first;
-                vector<int> stateKey = simbol_vektorNovihStanja.second;
+                vector<int> stateKey;// = simbol_vektorNovihStanja.second;
+                for(auto k : simbol_vektorNovihStanja.second)
+                    stateKey.push_back(k);
+
                 sort(stateKey.begin(), stateKey.end());
 
                 if(existingStates.find(stateKey) != existingStates.end()){ //postoji takvo stanje
@@ -99,11 +106,13 @@ DKA::DKA(NFA nfa){
                 else{ //potrebno je stvoriti novo stanje koje ce biti kombinacija prvobitnih stanja
                     new_state_added=true;
                     StateDFA combinedState;
-                    existingStates.insert(stateKey, structure.size());
+                    int index = structure.size();
+                    existingStates.insert({(stateKey),(index)});
                     structure.push_back(combinedState);
 
                     for(auto metaInfo : stateKey){
-                        combineStates(combineStates, existingStates(metaInfo));
+                        StateDFA popijMojeInformacijeMolimTe = structure.at(metaInfo);
+                        combineStates(combinedState, popijMojeInformacijeMolimTe);
                     }
                     transition.push_back(structure.size()-1);
                     transitionSymbol.push_back(simbol);
@@ -117,6 +126,16 @@ DKA::DKA(NFA nfa){
     }
 
 
+}
 
-
+void DKA::print()
+{
+    int count = 0;
+    for(auto it : structure){
+        cout<<endl<<count;
+        for(int j=0; j<it.transition.size(); j++){
+            cout<<"\t"<<(it.transitionSymbol.at(j))<<"\t"<<(it.transition.at(j))<<endl;
+        }
+        count++;
+    }
 }
