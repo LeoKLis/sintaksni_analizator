@@ -34,18 +34,14 @@ struct SWTable {
 
 class NFA {
 private:
-
     void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     template<typename T> bool exists(vector<T> array, T symbol);
-    int createState(string stateName);
-    void addTransition(int from, int to, string znak);
-    string stringifyStateProduction(StateNFA state);
-    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
 public:
+    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
+    string stringifyStateProduction(StateNFA state);
     vector<StateNFA> structure;
     map<string, int> existingStates;
     SWTable swtable;
-    vector<StateNFA> structure; //privremeno
     void addTransition(int from, int to, string znak);
     int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts); // Dodano!
     int createState(string stateName);

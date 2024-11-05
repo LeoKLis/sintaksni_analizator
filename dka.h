@@ -21,8 +21,7 @@ struct StateDFA{
     vector<int> dotIndex;
 
     vector<vector<string>> prodRightSide;
-
-    vector<vector<string>> starts;
+    vector<set<string>> starts;
 
     vector<string> transitionSymbol;
     vector<int> transition;
@@ -35,7 +34,7 @@ public:
     void combineStates(StateDFA base, StateDFA added);
     DKA(NFA nfa);
     void print();
-
+    string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
 };
 
 #endif

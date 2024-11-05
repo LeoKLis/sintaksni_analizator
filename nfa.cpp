@@ -69,7 +69,7 @@ string NFA::stringifyProduction(string prodLeftSide, vector<string> prodRightSid
     }
     // output.pop_back();
     output.append("{ ");
-    for(auto it : starts){
+    for (auto it : starts) {
         output.append(it + " ");
     }
     output.append("}");
@@ -189,7 +189,7 @@ void NFA::recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<st
             }
             if (exists(swtable.emptyChars, idx))
                 hadEmpty = true;
-            if(!exists(swtable.emptyChars, idx))
+            if (!exists(swtable.emptyChars, idx))
                 break;
         }
         if (hadEmpty)
@@ -231,31 +231,32 @@ set<int> NFA::resolveEpsilonEnviroment(set<int> current)
 
     set<int> nextStates;
     for (auto i : current) {
-        if (structure[i].epsilonTransitions.size()>0) {
+        if (structure[i].epsilonTransitions.size() > 0) {
             for (auto j : structure[i].epsilonTransitions)
                 nextStates.insert(j);
         }
     }
-
-    set<int> more_next_states = resolveEpsilonEnviroment(nextStates);
+    set<int> more_next_states = resolveEpsilonEnviroment(nextStates); // Problem
 
     for (auto i : more_next_states)
         nextStates.insert(i);
     return nextStates;
 }
 
-string NFA::normalTransitionSymbol(int stateIndex){
+string NFA::normalTransitionSymbol(int stateIndex)
+{
 
     StateNFA state = structure[stateIndex];
     return normalTransitionSymbol(state);
 }
 
-string NFA::normalTransitionSymbol(StateNFA state){
+string NFA::normalTransitionSymbol(StateNFA state)
+{
 
     string simbol = "ovo je kraj cijelog niza, svaka cast";
-    if(state.dotIndex>state.prodRightSide.size())
+    if (state.dotIndex >= state.prodRightSide.size())
         return simbol;
 
-    simbol = state.prodLeftSide.at(state.dotIndex);
+    simbol = state.prodRightSide.at(state.dotIndex);
     return simbol;
 }
