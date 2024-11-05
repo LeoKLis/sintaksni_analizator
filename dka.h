@@ -31,7 +31,7 @@ class DKA {
 private:
     vector<StateDFA> structure;
 public:
-    void combineStates(StateDFA base, StateDFA added);
+    void combineStates(StateDFA &base, StateDFA &added);
     DKA(NFA nfa);
     void print();
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);

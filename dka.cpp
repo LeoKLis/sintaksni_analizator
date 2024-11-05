@@ -2,8 +2,9 @@
 
 using namespace std;
 
-void DKA::combineStates(StateDFA base, StateDFA added)
+void DKA::combineStates(StateDFA &base, StateDFA &added)
 {
+
 
     for (int i = 0; i < added.dotIndex.size(); i++) {
 
@@ -51,7 +52,6 @@ DKA::DKA(NFA nfa)
         epsilon.insert(i);
         epsilon = nfa.resolveEpsilonEnviroment(epsilon);
         for (auto indexOfNewState : epsilon) {
-            cout << "Radi radi... " << i << endl;
             StateNFA new_state = nfa.structure.at(indexOfNewState); // stanje u epsilon okruzenju
             if (new_state.normalTransition != -1) { // ako ima normalTransition dalje, dodaj to u orginalno stanje
                 string simbol = nfa.normalTransitionSymbol(new_state);
@@ -61,10 +61,13 @@ DKA::DKA(NFA nfa)
         }
     } // ovo je sada obican nka, bez epsilona
     int i, n = 0;
-    cout << "Radi radi..." << endl;
+
 
     bool new_state_added = true;
+
     while (new_state_added == true) {
+
+
         new_state_added = false;
         i = n;
         n = structure.size();
@@ -101,15 +104,21 @@ DKA::DKA(NFA nfa)
                     transition.push_back(combinedState);
                     transitionSymbol.push_back(simbol);
                 } else { // potrebno je stvoriti novo stanje koje ce biti kombinacija prvobitnih stanja
+
                     new_state_added = true;
                     StateDFA combinedState;
                     int index = structure.size();
                     existingStates.insert({ (stateKey), (index) });
+                    //structure.push_back(combinedState);
+
+                    //cout<<"kombiniram: ";
+                    for (auto metaInfo : stateKey) {
+                        //cout<<metaInfo<<", ";
+                        combineStates(combinedState, structure.at(metaInfo));
+                    } //cout<<endl;
+
                     structure.push_back(combinedState);
 
-                    for (auto metaInfo : stateKey) {
-                        combineStates(combinedState, structure.at(metaInfo));
-                    }
                     transition.push_back(structure.size() - 1);
                     transitionSymbol.push_back(simbol);
                 }
@@ -120,12 +129,14 @@ DKA::DKA(NFA nfa)
             structure.at(i).transition = transition;
         }
     }
+
 }
 
 void DKA::print()
 {
     int count = 0;
     for (auto it : structure) {
+
         cout << endl << count++;
         for(int i=0; i<it.prodLeftSide.size(); i++){
             cout << "\t" << stringifyProduction(it.prodLeftSide[i], it.prodRightSide[i],  it.dotIndex[i], it.starts[i]) << endl;

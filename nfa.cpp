@@ -230,16 +230,58 @@ set<int> NFA::resolveEpsilonEnviroment(set<int> current)
         return current;
 
     set<int> nextStates;
+    set<int> nextererStates;
+    bool changes=true;
+
     for (auto i : current) {
         if (structure[i].epsilonTransitions.size() > 0) {
             for (auto j : structure[i].epsilonTransitions)
                 nextStates.insert(j);
         }
     }
+
+    while(changes==true){
+        changes = false;
+
+        for (auto i : nextStates) {
+            if (structure[i].epsilonTransitions.size() > 0) {
+                for (auto j : structure[i].epsilonTransitions){
+                    if( nextStates.find(j)==nextStates.end() && nextererStates.find(j)==nextererStates.end() ){
+                      nextererStates.insert(j);
+                      changes = true;
+                    }
+                }
+            }
+        }
+
+
+        for (auto i : nextererStates) {
+            if (structure[i].epsilonTransitions.size() > 0) {
+                for (auto j : structure[i].epsilonTransitions){
+                    if( nextStates.find(j)==nextStates.end() && nextererStates.find(j)==nextererStates.end() ){
+                        nextStates.insert(j);
+                        changes = true;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+    /*for (auto i : current) {
+        if (structure[i].epsilonTransitions.size() > 0) {
+            for (auto j : structure[i].epsilonTransitions)
+                nextStates.insert(j);
+        }
+    }
+
+
     set<int> more_next_states = resolveEpsilonEnviroment(nextStates); // Problem
 
     for (auto i : more_next_states)
-        nextStates.insert(i);
+        nextStates.insert(i); */
     return nextStates;
 }
 
