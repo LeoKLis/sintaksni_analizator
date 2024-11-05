@@ -52,7 +52,12 @@ string NFA::stringifyProduction(string prodLeftSide, vector<string> prodRightSid
     string output = "";
     output.append(prodLeftSide + " -> ");
     if (prodRightSide.size() == 1 && prodRightSide[0] == "$") {
-        output.append("0");
+        output.append("0 ");
+        output.append("{ ");
+        for (auto it : starts) {
+            output.append(it + " ");
+        }
+        output.append("}");
         return output;
     }
     bool wroteZero = false;

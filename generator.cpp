@@ -11,7 +11,7 @@ int main()
 
     NFA nfa;
     nfa.build(pp.nezavrsniZnakovi, pp.zavrsniZnakovi, pp.produkcije);
-    //nfa.printNFA();
+    nfa.printNFA();
 
     DKA dka(nfa);
     dka.print();
