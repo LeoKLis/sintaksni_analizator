@@ -2,8 +2,6 @@
 
 int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts)
 {
-    // map<string, vector<int>> mapa;
-    // nfaStructure.push_back(mapa);
     StateNFA state;
     state.prodLeftSide = prodLeftSide;
     state.normalTransition = -1;
@@ -12,29 +10,19 @@ int NFA::createState(string prodLeftSide, vector<string> prodRightSide, int dotI
     } else {
         state.prodRightSide = prodRightSide;
         state.dotIndex = dotIndex;
+        if (prodRightSide.size() > dotIndex)
+            state.normalTranSymbol = prodRightSide[dotIndex];
     }
     state.starts = starts;
     structure.push_back(state);
     return structure.size() - 1;
 }
 
-int NFA::createState(string stateName)
-{
-    StateNFA state;
-    state.prodLeftSide = stateName;
-    state.normalTransition = -1;
-    state.dotIndex = -1;
-
-    structure.push_back(state);
-    return structure.size() - 1;
-}
-
 void NFA::addTransition(int from, int to, string znak)
 {
-    // nfaStructure.at(from).at(znak).push_back(to);
     int dotIndex = structure[from].dotIndex;
     if (znak == EPSILON) {
-        structure[from].epsilonTransitions.push_back(to);
+        structure[from].epsilonTransitions.insert(to);
     } else if (dotIndex < structure[from].prodRightSide.size() && znak == structure[from].prodRightSide[dotIndex]) {
         structure[from].normalTransition = to;
     } else {
@@ -152,13 +140,6 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
     swtable.charIndex = charIndex;
     swtable.emptyChars = emptyChars;
 
-    // for(auto it : startsWithChar){
-    //     for(auto se : it){
-    //         cout << se << " ";
-    //     }
-    //     cout << endl;
-    // }
-
     string initialState = nonFinalChars[0];
     int init = createState("inicijalno", vector<string> { initialState }, 0, set<string> { "$" });
     recursiveBuild(init, nonFinalChars, finalChars, productions);
@@ -229,81 +210,32 @@ void NFA::printNFA()
     }
 }
 
-set<int> NFA::resolveEpsilonEnviroment(set<int> current)
+set<int> NFA::resolveEpsilonEnviroment(set<int> currentEnv)
 {
-    if (current.empty())
-        return current;
-
-    set<int> nextStates;
-    set<int> nextererStates;
-    bool changes=true;
-
-    for (auto i : current) {
-        if (structure[i].epsilonTransitions.size() > 0) {
-            for (auto j : structure[i].epsilonTransitions)
-                nextStates.insert(j);
-        }
+    if (currentEnv.empty())
+        return currentEnv;
+    if (epsEnvBigCache.find(currentEnv) != epsEnvBigCache.end()) {
+        return epsEnvBigCache[currentEnv];
     }
-
-    while(changes==true){
-        changes = false;
-
-        for (auto i : nextStates) {
-            if (structure[i].epsilonTransitions.size() > 0) {
-                for (auto j : structure[i].epsilonTransitions){
-                    if( nextStates.find(j)==nextStates.end() && nextererStates.find(j)==nextererStates.end() ){
-                      nextererStates.insert(j);
-                      changes = true;
-                    }
+    vector<int> outputEnv;
+    outputEnv.insert(outputEnv.begin(), currentEnv.begin(), currentEnv.end());
+    bool modified = true;
+    int staticIndex = 0;
+    while (modified) {
+        modified = false;
+        vector<int> tempEnv;
+        for (int i = staticIndex; i < outputEnv.size(); i++) {
+            for (int tran : structure[outputEnv[i]].epsilonTransitions) {
+                if (find(outputEnv.begin(), outputEnv.end(), tran) == outputEnv.end()) {
+                    tempEnv.push_back(tran);
+                    modified = true;
                 }
             }
         }
-
-
-        for (auto i : nextererStates) {
-            if (structure[i].epsilonTransitions.size() > 0) {
-                for (auto j : structure[i].epsilonTransitions){
-                    if( nextStates.find(j)==nextStates.end() && nextererStates.find(j)==nextererStates.end() ){
-                        nextStates.insert(j);
-                        changes = true;
-                    }
-                }
-            }
-        }
+        staticIndex = outputEnv.size();
+        outputEnv.insert(outputEnv.end(), tempEnv.begin(), tempEnv.end());
     }
-
-
-
-
-    /*for (auto i : current) {
-        if (structure[i].epsilonTransitions.size() > 0) {
-            for (auto j : structure[i].epsilonTransitions)
-                nextStates.insert(j);
-        }
-    }
-
-
-    set<int> more_next_states = resolveEpsilonEnviroment(nextStates); // Problem
-
-    for (auto i : more_next_states)
-        nextStates.insert(i); */
-    return nextStates;
-}
-
-string NFA::normalTransitionSymbol(int stateIndex)
-{
-
-    StateNFA state = structure[stateIndex];
-    return normalTransitionSymbol(state);
-}
-
-string NFA::normalTransitionSymbol(StateNFA state)
-{
-
-    string simbol = "ovo je kraj cijelog niza, svaka cast";
-    if (state.dotIndex >= state.prodRightSide.size())
-        return simbol;
-
-    simbol = state.prodRightSide.at(state.dotIndex);
-    return simbol;
+    set<int> outputSet = set<int>(outputEnv.begin(), outputEnv.end());
+    epsEnvBigCache.insert({ currentEnv, outputSet });
+    return outputSet;
 }

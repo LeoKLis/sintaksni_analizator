@@ -9,8 +9,10 @@
 #include <vector>
 #include <set>
 
+#include <chrono>
+#include <thread>
+
 #define EPSILON "epsilon"
-// #define NFA_STRUCTURE vector<map<string, vector<int>>>
 
 using namespace std;
 
@@ -22,8 +24,9 @@ struct StateNFA {
 
     set<string> starts;
 
+    string normalTranSymbol;
     int normalTransition;
-    vector<int> epsilonTransitions;
+    set<int> epsilonTransitions;
 };
 
 struct SWTable {
@@ -34,6 +37,8 @@ struct SWTable {
 
 class NFA {
 private:
+    map<set<int>, set<int>> epsEnvBigCache;
+    map<set<int>, set<int>> epsEnvSmallCache;
     void recursiveBuild(int stateIndex, vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     template<typename T> bool exists(vector<T> array, T symbol);
 public:
@@ -44,7 +49,6 @@ public:
     SWTable swtable;
     void addTransition(int from, int to, string znak);
     int createState(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts); // Dodano!
-    int createState(string stateName);
 
     void build(vector<string> nonFinalChars, vector<string> finalChars, map<string, vector<vector<string>>> productions);
     // Prvo se isprinta indeks stanja, pa pridruzena produkcija, pa ZAPOCINJE znakovi i onda prijelazi (jedan obicni i ostali epsilon prijelazi)
@@ -52,8 +56,6 @@ public:
     set<int> resolveEpsilonEnviroment(set<int> current);
     string normalTransitionSymbol(int stateIndex);
     string normalTransitionSymbol(StateNFA state);
-
-    int transition(int from, int to, string simbol);
 };
 
 #endif

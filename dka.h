@@ -14,27 +14,34 @@
 
 using namespace std;
 
+struct StateDFA {
 
-struct StateDFA{
-
-    vector<string> prodLeftSide; //bit ce ih vise jer se kao spoje
+    vector<string> prodLeftSide; // bit ce ih vise jer se kao spoje
     vector<int> dotIndex;
 
     vector<vector<string>> prodRightSide;
     vector<set<string>> starts;
 
-    vector<string> transitionSymbol;
-    vector<int> transition;
+    // vector<string> transitionSymbol;
+    // vector<set<int>> transition;
+
+    map<string, set<int>> transition;
 };
 
 class DKA {
 private:
+    map<set<int>, map<string, set<int>>> speedyCache;
     vector<StateDFA> structure;
-public:
-    void combineStates(StateDFA &base, StateDFA &added);
-    DKA(NFA nfa);
-    void print();
+    void removeStateElement(StateDFA& state, int position);
+    void combineStates(StateDFA& base, StateDFA added);
+    void appendNfaToState(StateDFA& base, StateNFA from);
+    void appendEnvToState(StateDFA& base, string symbol, set<int> lastEnv);
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
+    string stringifyTransition(set<int> transition);
+
+public:
+    DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi);
+    void print();
 };
 
 #endif
