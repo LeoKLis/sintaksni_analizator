@@ -49,6 +49,10 @@ ParserPravila::ParserPravila()
         novoPravilo.push_back(line);
         produkcije[trenutnaProdukcija].push_back(novoPravilo);
     }
+
+
+
+    symbolIndex = generate_symbolIndex();
 }
 
 void ParserPravila::printPravila()
@@ -74,4 +78,21 @@ void ParserPravila::printPravila()
             cout << endl;
         }
     }
+}
+
+
+map<string, int> ParserPravila::symbolIndex(){
+
+    map<string, int> mapa;
+    int count=0;
+
+    for(auto it : zavrsniZnakovi)
+        mapa.insert({it, count++});
+
+    mapa.insert({"$", count++});
+
+    for(auto it : nezavrsniZnakovi)
+        mapa.insert({it, count++});
+
+    return mapa;
 }

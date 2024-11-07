@@ -63,119 +63,6 @@ void DKA::removeStateElement(StateDFA& state, int position)
     state.starts.erase(pos);
 }
 
-/* DKA::DKA(NFA nfa)
-{
-    map<vector<int>, int> existingStates; // vektor je sorted skup tih stanja, int je index spojenog stanja
-
-    for (auto state : nfa.structure) { // dodana sva stanja s normalnim tranzicijama, bez epsilon tranzicija
-        // cout << "Proso epselon" << endl;
-        StateDFA dfa;
-        dfa.prodLeftSide.push_back(state.prodLeftSide);
-        dfa.starts.push_back(state.starts);
-        dfa.dotIndex.push_back(state.dotIndex);
-        dfa.prodRightSide.push_back(state.prodRightSide);
-
-        // cout << "Proso epselon ovo" << endl;
-        if (state.normalTransition != -1) {
-            string simbol = nfa.normalTransitionSymbol(state);
-            dfa.transitionSymbol.push_back(simbol);
-            dfa.transition.push_back(state.normalTransition);
-        }
-
-        structure.push_back(dfa);
-
-        // vector<int> stateIndex;
-        vector<int> combinedStates;
-        // stateIndex.push_back(structure.size()-1);
-        combinedStates.push_back(structure.size() - 1);
-        existingStates.insert({ combinedStates, structure.size() - 1 });
-    }
-
-    /// rjesavanje epsilon tranzicija
-    for (int i = 0; i < structure.size(); i++) {
-        set<int> epsilon;
-        epsilon.insert(i);
-        epsilon = nfa.resolveEpsilonEnviroment(epsilon);
-        for (auto indexOfNewState : epsilon) {
-            StateNFA new_state = nfa.structure.at(indexOfNewState); // stanje u epsilon okruzenju
-            if (new_state.normalTransition != -1) { // ako ima normalTransition dalje, dodaj to u orginalno stanje
-                string simbol = nfa.normalTransitionSymbol(new_state);
-                structure[i].transition.push_back(new_state.normalTransition);
-                structure[i].transitionSymbol.push_back(simbol);
-            }
-        }
-    } // ovo je sada obican nka, bez epsilona
-    int i, n = 0;
-
-
-    bool new_state_added = true;
-
-    while (new_state_added == true) {
-
-
-        new_state_added = false;
-        i = n;
-        n = structure.size();
-
-        for (; i < n; i++) {
-            // StateDFA state = structure.at(i);
-            vector<string> transitionSymbol; // ovo ce kasnije state.transitionSymbol = transitionSymbol
-            vector<int> transition; // ovo ce kasnije state.transition = transition
-
-            map<string, vector<int>> sortedTransitions;
-
-            for (int j = 0; j < structure.at(i).transition.size(); j++) { // analiziranje svakog prijelaza stanja State
-                string simbol = structure.at(i).transitionSymbol.at(j);
-                int nextState = structure.at(i).transition.at(j);
-                if (sortedTransitions.find(simbol) != sortedTransitions.end())
-                    (sortedTransitions.at(simbol)).push_back(nextState);
-                else {
-                    vector<int> vec;
-                    vec.push_back(nextState);
-                    sortedTransitions.insert({ simbol, vec });
-                }
-            }
-
-            for (auto simbol_vektorNovihStanja : sortedTransitions) {
-                string simbol = simbol_vektorNovihStanja.first;
-                vector<int> stateKey; // = simbol_vektorNovihStanja.second;
-                for (auto k : simbol_vektorNovihStanja.second)
-                    stateKey.push_back(k);
-
-                sort(stateKey.begin(), stateKey.end());
-
-                if (existingStates.find(stateKey) != existingStates.end()) { // postoji takvo stanje
-                    int combinedState = existingStates.at(stateKey);
-                    transition.push_back(combinedState);
-                    transitionSymbol.push_back(simbol);
-                } else { // potrebno je stvoriti novo stanje koje ce biti kombinacija prvobitnih stanja
-
-                    new_state_added = true;
-                    StateDFA combinedState;
-                    int index = structure.size();
-                    existingStates.insert({ (stateKey), (index) });
-                    //structure.push_back(combinedState);
-
-                    //cout<<"kombiniram: ";
-                    for (auto metaInfo : stateKey) {
-                        //cout<<metaInfo<<", ";
-                        combineStates(combinedState, structure.at(metaInfo));
-                    } //cout<<endl;
-
-                    structure.push_back(combinedState);
-
-                    transition.push_back(structure.size() - 1);
-                    transitionSymbol.push_back(simbol);
-                }
-            }
-            structure.at(i).transitionSymbol.clear();
-            structure.at(i).transition.clear();
-            structure.at(i).transitionSymbol = transitionSymbol;
-            structure.at(i).transition = transition;
-        }
-    }
-
-} */
 
 DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi)
 {
@@ -227,15 +114,7 @@ DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi
                 indexMapping[tran] = index++;
                 for (int th : se->second) {
                     appendNfaToState(tempState, nfa.structure[th]);
-                    // if(index < 50)
-                    //     cout << th << " ";
-                }
-                // if(index < 50)
-                //     cout << endl;
-                // if(speedyCache.find(se->second) != speedyCache.end()){
-                //     cout << "Found in cache!" << endl;
-                //     tempState.transition = speedyCache.at(se->second);
-                // }
+
                 chrono::steady_clock::time_point begin = chrono::steady_clock::now();
                 for (int th : se->second) {
                     for (auto el = tempStructure[th].transition.cbegin(); el != tempStructure[th].transition.cend(); el++) {
@@ -273,12 +152,15 @@ DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi
     }
     // cout << "Ukupno vrijeme odsjecka " << sumTime << endl;
     cout << "Output size: " << output.size() << endl;
+    structure = output;
 }
 
 void DKA::print()
 {
     int count = 0;
     for (auto it : structure) {
+        if(count==3150)
+            return;
 
         cout << endl
              << count++;
@@ -326,4 +208,56 @@ string DKA::stringifyProduction(string prodLeftSide, vector<string> prodRightSid
     }
     output.append("}");
     return output;
+}
+
+vector<vector<Pair>> DKA::get_table(map<int, vector<string>> &stavke, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi, map<string, int> symbolIndex){
+
+    vector<vector<Pair>> table;
+    nezavrsniZnakovi.push_back("$");
+
+
+
+
+    for(int i=0; i<structure.size(); i++){
+        StateDFA state = structure.at(i);
+
+        ///ispunjavanje NovoStanje dijela tablice
+        for(auto prijelaz : state.transition){
+
+            if(zavrsniZnakovi.find(prijelaz.first) != zavrsniZnakovi.end()) //state ima prijelaz s nezavrsnim simbolom
+                table[i][symbolIndex.at(prijelaz.first)] = pair(Action.stavi, prijelaz.second);
+        }
+
+        ///ispunjavanje NovoStanje dijela tablice
+        for(int j=0; j<state.dotIndex.size(); j++){
+            int dotIndex = state.dotIndex.at(j);
+            string> prodLeftSide = state.prodLeftSide.at(j);
+            vector<string> prodRightSide = state.prodRightSide.at(j);
+            set<string> starts = state.starts.at(j);
+
+            if(dotIndex>prodLeftSide.size()){ //ili reduciraj jer je dot skroz na kraju desne strane
+                for(auto simbolcic : zavrsniZnakovi){
+                    if(starts.find(simbolcic) != starts.end()){ //simbolcic se mora nalaziti u starts {}
+                        int n = stavke.size();
+                        stavke.insert({n, prodRightSide});
+                        table[i][symbolIndex.at(simbolcic)] = pair(Action.reduciraj, n);
+                    }
+                }
+            }
+            else{ //pomakni
+                string zavrsniZnakic = prodLeftSide.at(dotIndex);//jos nije 100% da je zavrsan
+                if(state.transition.find(zavrsniZnakic) != state.transition.end() && zavrsniZnakovi.find(zavrsniZnakovi)!=zavrsni.end()){ //postoji prijelaz iz stanja state sa simbolom zavrsniZnakic i zavrsniZnakic jest 100% zavrsan
+                    table[i][symbolIndex.at(zavrsniZnakic)] = pair(Action.pomakni, state.transition.at(zavrsniZnakic));
+                }
+            }
+        }
+    }
+
+    ///PRIHVACAM OOOO DA PRIHVACAM
+    if(structure[1].prodLeftSide[0] != "inicijalno")
+        cout<<"Nije dobro";
+    else
+        table[1][symbolIndex.at("$")] = pair(Action.prihvati, 0);
+
+
 }
