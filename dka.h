@@ -16,14 +16,11 @@ using namespace std;
 
 struct StateDFA {
 
-    vector<string> prodLeftSide; // bit ce ih vise jer se kao spoje
+    vector<string> prodLeftSide;
     vector<int> dotIndex;
 
     vector<vector<string>> prodRightSide;
     vector<set<string>> starts;
-
-    // vector<string> transitionSymbol;
-    // vector<set<int>> transition;
 
     map<string, set<int>> transition;
 };
@@ -32,6 +29,7 @@ class DKA {
 private:
     map<set<int>, map<string, set<int>>> speedyCache;
     vector<StateDFA> structure;
+    map<string, int> indexMapping;
     void removeStateElement(StateDFA& state, int position);
     void combineStates(StateDFA& base, StateDFA added);
     void appendNfaToState(StateDFA& base, StateNFA from);

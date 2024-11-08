@@ -15,8 +15,7 @@ int main()
     // nfa.printNFA();
 
     DKA dka(nfa, pp.nezavrsniZnakovi, pp.zavrsniZnakovi);
-    // dka.print();
-
+    dka.print();
 
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     auto time = chrono::duration_cast<chrono::microseconds>(end - begin).count();

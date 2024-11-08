@@ -9,15 +9,26 @@
 
 using namespace std;
 
+enum Action {
+    pomakni, reduciraj, prihvati, stavi
+};
+
+struct Pair {
+    Action action;
+    int stavka;
+};
+
 class Deserializer {
 private:
     void parseLine(vector<string> *arr, string line);
+    void generateSymbMap();
 public:
     vector<string> nezavrsniZnakovi;
     vector<string> zavrsniZnakovi;
     vector<string> sinkronizacijskiZnakovi;
-    vector<map<string, string>> akcija;
-    vector<map<string, string>> novoStanje;
+    map<string, int> symbolIndex;
+    
+    vector<vector<Pair>> tablica;
 
     Deserializer();
     void printData();

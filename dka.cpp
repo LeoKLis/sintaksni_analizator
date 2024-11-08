@@ -4,26 +4,10 @@ using namespace std;
 
 void DKA::combineStates(StateDFA& base, StateDFA added)
 {
-    // for (int i = 0; i < added.dotIndex.size(); i++) {
-
-    //     base.prodLeftSide.push_back(added.prodLeftSide.at(i));
-
-    //     base.starts.push_back(added.starts.at(i));
-
-    //     base.dotIndex.push_back(added.dotIndex.at(i));
-
-    //     base.prodRightSide.push_back(added.prodRightSide.at(i));
-    // }
-
     base.prodLeftSide.insert(base.prodLeftSide.end(), added.prodLeftSide.begin(), added.prodLeftSide.end());
     base.prodRightSide.insert(base.prodRightSide.end(), added.prodRightSide.begin(), added.prodRightSide.end());
     base.dotIndex.insert(base.dotIndex.end(), added.dotIndex.begin(), added.dotIndex.end());
     base.starts.insert(base.starts.end(), added.starts.begin(), added.starts.end());
-
-    // base.transition.insert(added.transition.begin(), added.transition.end());
-    // for (auto el = added.transition.begin(); el != added.transition.end(); el++) {
-    //     base.transition[el->first].insert(el->second.begin(), el->second.end());
-    // }
 }
 
 void DKA::appendNfaToState(StateDFA& base, StateNFA from)
@@ -63,120 +47,6 @@ void DKA::removeStateElement(StateDFA& state, int position)
     state.starts.erase(pos);
 }
 
-/* DKA::DKA(NFA nfa)
-{
-    map<vector<int>, int> existingStates; // vektor je sorted skup tih stanja, int je index spojenog stanja
-
-    for (auto state : nfa.structure) { // dodana sva stanja s normalnim tranzicijama, bez epsilon tranzicija
-        // cout << "Proso epselon" << endl;
-        StateDFA dfa;
-        dfa.prodLeftSide.push_back(state.prodLeftSide);
-        dfa.starts.push_back(state.starts);
-        dfa.dotIndex.push_back(state.dotIndex);
-        dfa.prodRightSide.push_back(state.prodRightSide);
-
-        // cout << "Proso epselon ovo" << endl;
-        if (state.normalTransition != -1) {
-            string simbol = nfa.normalTransitionSymbol(state);
-            dfa.transitionSymbol.push_back(simbol);
-            dfa.transition.push_back(state.normalTransition);
-        }
-
-        structure.push_back(dfa);
-
-        // vector<int> stateIndex;
-        vector<int> combinedStates;
-        // stateIndex.push_back(structure.size()-1);
-        combinedStates.push_back(structure.size() - 1);
-        existingStates.insert({ combinedStates, structure.size() - 1 });
-    }
-
-    /// rjesavanje epsilon tranzicija
-    for (int i = 0; i < structure.size(); i++) {
-        set<int> epsilon;
-        epsilon.insert(i);
-        epsilon = nfa.resolveEpsilonEnviroment(epsilon);
-        for (auto indexOfNewState : epsilon) {
-            StateNFA new_state = nfa.structure.at(indexOfNewState); // stanje u epsilon okruzenju
-            if (new_state.normalTransition != -1) { // ako ima normalTransition dalje, dodaj to u orginalno stanje
-                string simbol = nfa.normalTransitionSymbol(new_state);
-                structure[i].transition.push_back(new_state.normalTransition);
-                structure[i].transitionSymbol.push_back(simbol);
-            }
-        }
-    } // ovo je sada obican nka, bez epsilona
-    int i, n = 0;
-
-
-    bool new_state_added = true;
-
-    while (new_state_added == true) {
-
-
-        new_state_added = false;
-        i = n;
-        n = structure.size();
-
-        for (; i < n; i++) {
-            // StateDFA state = structure.at(i);
-            vector<string> transitionSymbol; // ovo ce kasnije state.transitionSymbol = transitionSymbol
-            vector<int> transition; // ovo ce kasnije state.transition = transition
-
-            map<string, vector<int>> sortedTransitions;
-
-            for (int j = 0; j < structure.at(i).transition.size(); j++) { // analiziranje svakog prijelaza stanja State
-                string simbol = structure.at(i).transitionSymbol.at(j);
-                int nextState = structure.at(i).transition.at(j);
-                if (sortedTransitions.find(simbol) != sortedTransitions.end())
-                    (sortedTransitions.at(simbol)).push_back(nextState);
-                else {
-                    vector<int> vec;
-                    vec.push_back(nextState);
-                    sortedTransitions.insert({ simbol, vec });
-                }
-            }
-
-            for (auto simbol_vektorNovihStanja : sortedTransitions) {
-                string simbol = simbol_vektorNovihStanja.first;
-                vector<int> stateKey; // = simbol_vektorNovihStanja.second;
-                for (auto k : simbol_vektorNovihStanja.second)
-                    stateKey.push_back(k);
-
-                sort(stateKey.begin(), stateKey.end());
-
-                if (existingStates.find(stateKey) != existingStates.end()) { // postoji takvo stanje
-                    int combinedState = existingStates.at(stateKey);
-                    transition.push_back(combinedState);
-                    transitionSymbol.push_back(simbol);
-                } else { // potrebno je stvoriti novo stanje koje ce biti kombinacija prvobitnih stanja
-
-                    new_state_added = true;
-                    StateDFA combinedState;
-                    int index = structure.size();
-                    existingStates.insert({ (stateKey), (index) });
-                    //structure.push_back(combinedState);
-
-                    //cout<<"kombiniram: ";
-                    for (auto metaInfo : stateKey) {
-                        //cout<<metaInfo<<", ";
-                        combineStates(combinedState, structure.at(metaInfo));
-                    } //cout<<endl;
-
-                    structure.push_back(combinedState);
-
-                    transition.push_back(structure.size() - 1);
-                    transitionSymbol.push_back(simbol);
-                }
-            }
-            structure.at(i).transitionSymbol.clear();
-            structure.at(i).transition.clear();
-            structure.at(i).transitionSymbol = transitionSymbol;
-            structure.at(i).transition = transition;
-        }
-    }
-
-} */
-
 DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi)
 {
     vector<string> sviZnakovi = nezavrsniZnakovi;
@@ -209,7 +79,6 @@ DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi
             appendNfaToState(output[0], state);
         }
     }
-    map<string, int> indexMapping;
     indexMapping["0"] = 0;
     int index = 1;
     int iter = 0;
@@ -254,10 +123,16 @@ DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi
         }
         iter += 1;
     }
+    // cout << "Ukupno vrijeme odsjecka " << sumTime << endl;
+    cout << "Output size: " << output.size() << endl;
+    structure = output;
+}
 
-    for (auto it = 0; it < output.size(); it++) {
+void DKA::print()
+{
+    for (auto it = 0; it < structure.size(); it++) {
         cout << it << " -> " << endl;
-        StateDFA s = output[it];
+        StateDFA s = structure[it];
         for (int i = 0; i < s.prodLeftSide.size(); i++) {
             string prod = stringifyProduction(s.prodLeftSide[i], s.prodRightSide[i], s.dotIndex[i], s.starts[i]);
             cout << "\t" << prod << endl;
@@ -270,32 +145,6 @@ DKA::DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi
             cout << indexMapping[stringifyTransition(se->second)] << endl;
         }
         cout << endl;
-    }
-    // cout << "Ukupno vrijeme odsjecka " << sumTime << endl;
-    cout << "Output size: " << output.size() << endl;
-}
-
-void DKA::print()
-{
-    int count = 0;
-    for (auto it : structure) {
-
-        cout << endl
-             << count++;
-        if (it.prodLeftSide.empty())
-            cout << "\t-" << endl;
-        for (int i = 0; i < it.prodLeftSide.size(); i++) {
-            string prod = stringifyProduction(it.prodLeftSide[i], it.prodRightSide[i], it.dotIndex[i], it.starts[i]);
-            cout << "\t" << prod << endl;
-        }
-        cout << endl;
-        for (auto se = it.transition.cbegin(); se != it.transition.cend(); se++) {
-            cout << "\t" << se->first << " -> ";
-            for (int th : se->second) {
-                cout << th << " ";
-            }
-            cout << endl;
-        }
     }
 }
 

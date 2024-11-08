@@ -14,35 +14,10 @@ Deserializer::Deserializer()
     parseLine(&sinkronizacijskiZnakovi, line);
 
     while (getline(file, line)) {
-        if (line.empty()) break;
         if (line[line.size() - 1] != ' ') line.push_back(' ');
         int spaceIndex;
         int colIndex = 0;
-        map<string, string> rowMap;
-        string colChar;
-        while ((spaceIndex = line.find(" ")) != string::npos) {
-            if (colIndex >= zavrsniZnakovi.size())
-                colChar = "$";
-            else
-                colChar = zavrsniZnakovi[colIndex];
-            string el = line.substr(0, spaceIndex);
-            if (el == "-"){
-                colIndex++;
-                line = line.substr(spaceIndex + 1);
-                continue;
-            }
-            rowMap.insert({ colChar, el });
-            line = line.substr(spaceIndex + 1);
-            colIndex++;
-        }
-        akcija.push_back(rowMap);
-    }
-
-    while (getline(file, line)) {
-        if (line[line.size() - 1] != ' ') line.push_back(' ');
-        int spaceIndex;
-        int colIndex = 0;
-        map<string, string> rowMap;
+        vector<Pair> tempVec;
         string colChar;
         while ((spaceIndex = line.find(" ")) != string::npos) {
             colChar = nezavrsniZnakovi[colIndex];
@@ -52,14 +27,16 @@ Deserializer::Deserializer()
                 line = line.substr(spaceIndex + 1);
                 continue;
             }
-            rowMap.insert({ colChar, el });
+            // tempVec.push_back(); Stao
             line = line.substr(spaceIndex + 1);
             colIndex++;
         }
-        novoStanje.push_back(rowMap);
+        tablica.push_back(tempVec);
     }
 
     file.close();
+
+    generateSymbMap();
 }
 
 void Deserializer::parseLine(vector<string>* arr, string line)
@@ -71,6 +48,17 @@ void Deserializer::parseLine(vector<string>* arr, string line)
         arr->push_back(line.substr(0, spaceIndex));
         line = line.substr(spaceIndex + 1);
     }
+}
+
+void Deserializer::generateSymbMap(){
+    int count = 0;
+    for(auto it : zavrsniZnakovi)
+        symbolIndex.insert({it, count++});
+    
+    symbolIndex.insert({"$", count++});
+
+    for(auto it : nezavrsniZnakovi)
+        symbolIndex.insert({it, count++});
 }
 
 void Deserializer::printData()
@@ -118,3 +106,4 @@ void Deserializer::printData()
         cout << endl;
     }
 }
+
