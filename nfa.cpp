@@ -238,4 +238,43 @@ set<int> NFA::resolveEpsilonEnviroment(set<int> currentEnv)
     set<int> outputSet = set<int>(outputEnv.begin(), outputEnv.end());
     epsEnvBigCache.insert({ currentEnv, outputSet });
     return outputSet;
+
+
+
+
+    /*for (auto i : current) {
+        if (structure[i].epsilonTransitions.size() > 0) {
+            for (auto j : structure[i].epsilonTransitions)
+                nextStates.insert(j);
+        }
+    }
+
+
+    set<int> more_next_states = resolveEpsilonEnviroment(nextStates); // Problem
+
+    for (auto i : more_next_states)
+        nextStates.insert(i); */
+
+    for(auto i : nextererStates)
+        nextStates.insert(i);
+
+    return nextStates;
+}
+
+string NFA::normalTransitionSymbol(int stateIndex)
+{
+
+    StateNFA state = structure[stateIndex];
+    return normalTransitionSymbol(state);
+}
+
+string NFA::normalTransitionSymbol(StateNFA state)
+{
+
+    string simbol = "ovo je kraj cijelog niza, svaka cast";
+    if (state.dotIndex >= state.prodRightSide.size())
+        return simbol;
+
+    simbol = state.prodRightSide.at(state.dotIndex);
+    return simbol;
 }

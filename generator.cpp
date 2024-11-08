@@ -17,7 +17,10 @@ int main()
     DKA dka(nfa, pp.nezavrsniZnakovi, pp.zavrsniZnakovi);
     dka.print();
 
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    auto time = chrono::duration_cast<chrono::microseconds>(end - begin).count();
-    cout << "Vrijeme izvodenja: " << time << "[µs] " << endl;
+    //dka.print();
+
+    map<string, int> stavke
+
+    vector<vector<Pair>> table = dka.get_table(&stavke, pp.nezavrsniZnakovi, pp.zavrsniZnakovi, pp.symbolIndex);
+
 }

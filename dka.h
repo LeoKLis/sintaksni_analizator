@@ -25,6 +25,15 @@ struct StateDFA {
     map<string, set<int>> transition;
 };
 
+
+enum Action{pomakni, reduciraj, prihvati, stavi};
+
+struct Pair{
+Action action;
+int stavka;
+};
+
+
 class DKA {
 private:
     map<set<int>, map<string, set<int>>> speedyCache;
@@ -34,12 +43,21 @@ private:
     void combineStates(StateDFA& base, StateDFA added);
     void appendNfaToState(StateDFA& base, StateNFA from);
     void appendEnvToState(StateDFA& base, string symbol, set<int> lastEnv);
+    Pair pair(Action a,int b){
+        Pair par;
+        par.action = a;
+        par.stavka = b;
+    };
+
+public:
+    void combineStates(StateDFA &base, StateDFA &added);
+    DKA(NFA nfa, vector<string> nezavrsni, vector<string> zavrsni);
+
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
     string stringifyTransition(set<int> transition);
 
-public:
-    DKA(NFA nfa, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi);
     void print();
+    vector<vector<Pair>> get_table(map<int, vector<string>> &stavke, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi, map<string, int> symbolIndex);
 };
 
 #endif
