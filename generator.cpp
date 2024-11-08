@@ -19,7 +19,7 @@ int main()
 
     //dka.print();
 
-    map<string, int> stavke
+    map<string, int> stavke;
 
     vector<vector<Pair>> table = dka.get_table(&stavke, pp.nezavrsniZnakovi, pp.zavrsniZnakovi, pp.symbolIndex);
 
