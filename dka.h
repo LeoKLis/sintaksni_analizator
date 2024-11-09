@@ -9,9 +9,6 @@
 
 #include "nfa.h"
 
-#define EPSILON "epsilon"
-// #define NFA_STRUCTURE vector<map<string, vector<int>>>
-
 using namespace std;
 
 struct StateDFA {
@@ -25,39 +22,44 @@ struct StateDFA {
     map<string, set<int>> transition;
 };
 
-
-enum Action{pomakni, reduciraj, prihvati, stavi};
-
-struct Pair{
-Action action;
-int stavka;
+enum Action {
+    pomakni,
+    reduciraj,
+    prihvati,
+    stavi,
+    odbaci
 };
 
+struct Pair {
+    Action action;
+    int stavka;
+    Pair(Action a, int b)
+    {
+        action = a;
+        stavka = b;
+    }
+};
 
 class DKA {
 private:
     map<set<int>, map<string, set<int>>> speedyCache;
     vector<StateDFA> structure;
     map<string, int> indexMapping;
+
     void removeStateElement(StateDFA& state, int position);
     void combineStates(StateDFA& base, StateDFA added);
     void appendNfaToState(StateDFA& base, StateNFA from);
     void appendEnvToState(StateDFA& base, string symbol, set<int> lastEnv);
-    Pair pair(Action a,int b){
-        Pair par;
-        par.action = a;
-        par.stavka = b;
-    };
 
 public:
-    void combineStates(StateDFA &base, StateDFA &added);
     DKA(NFA nfa, vector<string> nezavrsni, vector<string> zavrsni);
 
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
     string stringifyTransition(set<int> transition);
+    bool isAcceptState(StateDFA state);
 
     void print();
-    vector<vector<Pair>> get_table(map<int, vector<string>> &stavke, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi, map<string, int> symbolIndex);
+    vector<vector<Pair>> getTable(map<int, vector<string>>& stavke, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi, map<string, int> symbolIndex);
 };
 
 #endif

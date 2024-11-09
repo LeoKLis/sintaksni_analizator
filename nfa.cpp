@@ -238,27 +238,6 @@ set<int> NFA::resolveEpsilonEnviroment(set<int> currentEnv)
     set<int> outputSet = set<int>(outputEnv.begin(), outputEnv.end());
     epsEnvBigCache.insert({ currentEnv, outputSet });
     return outputSet;
-
-
-
-
-    /*for (auto i : current) {
-        if (structure[i].epsilonTransitions.size() > 0) {
-            for (auto j : structure[i].epsilonTransitions)
-                nextStates.insert(j);
-        }
-    }
-
-
-    set<int> more_next_states = resolveEpsilonEnviroment(nextStates); // Problem
-
-    for (auto i : more_next_states)
-        nextStates.insert(i); */
-
-    for(auto i : nextererStates)
-        nextStates.insert(i);
-
-    return nextStates;
 }
 
 string NFA::normalTransitionSymbol(int stateIndex)

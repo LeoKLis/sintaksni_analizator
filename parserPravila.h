@@ -11,7 +11,7 @@ using namespace std;
 
 class ParserPravila {
 private:
-    map<string, int> generate_symbolIndex();
+    map<string, int> getSymbolIndex();
 public:
     vector<string> nezavrsniZnakovi;
     vector<string> zavrsniZnakovi;

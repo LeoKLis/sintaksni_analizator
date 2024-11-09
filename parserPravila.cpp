@@ -6,7 +6,7 @@ ParserPravila::ParserPravila()
     int razmakIndex;
 
     // nezavrsni znakovi gramatike
-    // ifstream ulaz("primjeri/ppj_simple.txt");
+    // ifstream ulaz("primjeri/mini_primjer.txt");
     getline(cin, line);
     line = line.substr(line.find_first_of(' ') + 1);
     while ((razmakIndex = line.find_first_of(' ')) != string::npos) {
@@ -50,9 +50,7 @@ ParserPravila::ParserPravila()
         produkcije[trenutnaProdukcija].push_back(novoPravilo);
     }
 
-
-
-    symbolIndex = generate_symbolIndex();
+    symbolIndex = getSymbolIndex();
 }
 
 void ParserPravila::printPravila()
@@ -80,8 +78,7 @@ void ParserPravila::printPravila()
     }
 }
 
-
-map<string, int> ParserPravila::symbolIndex(){
+map<string, int> ParserPravila::getSymbolIndex(){
 
     map<string, int> mapa;
     int count=0;
@@ -90,6 +87,7 @@ map<string, int> ParserPravila::symbolIndex(){
         mapa.insert({it, count++});
 
     mapa.insert({"$", count++});
+    mapa.insert({"inicijalno", count++});
 
     for(auto it : nezavrsniZnakovi)
         mapa.insert({it, count++});
