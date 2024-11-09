@@ -2,7 +2,7 @@
 
 Deserializer::Deserializer()
 {
-    ifstream file("./input.txt");
+    ifstream file("input.txt");
     string line;
     getline(file, line);
     parseLine(&nezavrsniZnakovi, line);
@@ -13,30 +13,43 @@ Deserializer::Deserializer()
     getline(file, line);
     parseLine(&sinkronizacijskiZnakovi, line);
 
+    getline(file, line);
+    parseSymbIndex(&symbolIndex, line);
+
     while (getline(file, line)) {
-        if (line[line.size() - 1] != ' ') line.push_back(' ');
-        int spaceIndex;
-        int colIndex = 0;
-        vector<Pair> tempVec;
-        string colChar;
+        if (line.length() == 0)
+            break;
+        if (line[line.size() - 1] != ' ')
+            line.push_back(' ');
+        int spaceIndex = line.find(" ");
+        int idx = stoi(line.substr(0, spaceIndex));
+        line = line.substr(spaceIndex + 1);
+        vector<string> production;
         while ((spaceIndex = line.find(" ")) != string::npos) {
-            colChar = nezavrsniZnakovi[colIndex];
-            string el = line.substr(0, spaceIndex);
-            if (el == "-"){
-                colIndex++;
-                line = line.substr(spaceIndex + 1);
-                continue;
-            }
-            // tempVec.push_back(); Stao
+            string prodEl = line.substr(0, spaceIndex);
             line = line.substr(spaceIndex + 1);
-            colIndex++;
+            production.push_back(prodEl);
+        }
+        stavke.insert({ idx, production });
+    }
+
+    while (getline(file, line)) {
+        if (line[line.size() - 1] != ' ')
+            line.push_back(' ');
+        int spaceIndex;
+        vector<Pair> tempVec;
+        while ((spaceIndex = line.find(" ")) != string::npos) {
+            string el = line.substr(0, spaceIndex);
+            int commaIndex = el.find(",");
+            int act = stoi(el.substr(0, commaIndex));
+            int sta = stoi(el.substr(commaIndex + 1));
+            tempVec.push_back(Pair(act, sta));
+            line = line.substr(spaceIndex + 1);
         }
         tablica.push_back(tempVec);
     }
 
     file.close();
-
-    generateSymbMap();
 }
 
 void Deserializer::parseLine(vector<string>* arr, string line)
@@ -50,15 +63,19 @@ void Deserializer::parseLine(vector<string>* arr, string line)
     }
 }
 
-void Deserializer::generateSymbMap(){
-    int count = 0;
-    for(auto it : zavrsniZnakovi)
-        symbolIndex.insert({it, count++});
-    
-    symbolIndex.insert({"$", count++});
-
-    for(auto it : nezavrsniZnakovi)
-        symbolIndex.insert({it, count++});
+void Deserializer::parseSymbIndex(map<string, int>* symbolIndex, string line)
+{
+    if (line[line.size() - 1] != ' ')
+        line.push_back(' ');
+    int spaceIndex;
+    while ((spaceIndex = line.find(" ")) != string::npos) {
+        string symb = line.substr(0, spaceIndex);
+        line = line.substr(spaceIndex + 1);
+        spaceIndex = line.find(" ");
+        int idx = stoi(line.substr(0, spaceIndex));
+        line = line.substr(spaceIndex + 1);
+        symbolIndex->insert({ symb, idx });
+    }
 }
 
 void Deserializer::printData()
@@ -76,34 +93,27 @@ void Deserializer::printData()
     }
     cout << endl;
 
-    int counter = 0;
-    for (auto it : akcija) {
-        cout << counter << " ";
-        for (auto se : zavrsniZnakovi) {
-            if (akcija[counter].count(se) == 0)
-                cout << se << " -> -\t";
-            else
-                cout << se << " -> " << akcija[counter].at(se) << "\t";
-        }
-        if (akcija[counter].count("$") == 0)
-                cout << "$ -> -\t";
-            else
-                cout <<"$ -> " << akcija[counter].at("$") << "\t";
-        counter += 1;
-        cout << endl;
+    for (auto it : symbolIndex) {
+        cout << it.first << " " << it.second << endl;
     }
     cout << endl;
-    counter = 0;
-    for (auto it : novoStanje) {
-        cout << counter << " ";
-        for (auto se : nezavrsniZnakovi) {
-            if (novoStanje[counter].count(se) == 0)
-                cout << se << " -> -\t";
-            else
-                cout << se << " -> " << novoStanje[counter].at(se) << "\t";
+
+    for (auto it : stavke) {
+        cout << it.first << ": ";
+        cout << it.second[0] << " -> ";
+        for (auto se = it.second.begin() + 1; se != it.second.end(); se++) {
+            cout << *se << " ";
         }
-        counter += 1;
         cout << endl;
     }
-}
 
+    int counter = 0;
+    for (auto it : tablica) {
+        cout << counter << ": ";
+        for (auto se : it) {
+            cout << se.action << "," << se.stavka << " ";
+        }
+        cout << endl;
+        counter += 1;
+    }
+}
