@@ -93,6 +93,40 @@ void Simulator::simulate()
             prihvat = true;
 
         } else if (akcija.action == odbaci) {
+
+            int errorRowNum = rowNum;
+            vector<string> expected; //moguci simboli (koji ne bi izbacili pogresku)
+            for(int i =0; i<d.tablica.at(0).size(); i++){
+                    if(d.tablica[i][d.symbolIndex.at(currentBranch)].action != odbaci)
+                        expected.push_back(d.indexToSymbol.at(i));
+            }
+
+
+            cerr<<"Error at line "<<errorRowNum<<"; '"<<lexUnit<<"' is "<<uniform<<" instead of ";
+            for(int i=0; i<expected.size()-2; i++)
+                cerr<<expected.at(i)<<", ";
+            if(expected.size()>1){
+                cerr<<expected.at(1)<<" or "<<expected.at(0)<<endl;
+            }
+            else if(expected.size()==1) cerr<<expected.at(0)<<endl;
+
+
+            while(1==1){
+                parseLine(line, &uniform, &rowNum, &lexUnit);
+                if(find(d.sinkronizacijskiZnakovi.begin(),d.sinkronizacijskiZnakovi.end(), uniform) != d.sinkronizacijskiZnakovi.end())
+                    break;
+            }
+
+            while ((d.tablica[stog.top().second][d.symbolIndex[currentBranch]]).action != stavi) {
+                 stog.pop();
+             }
+             stog.pop();//mozda nepotrebno, ne znam
+             int novoStanje = d.tablica[stog.top().second][d.symbolIndex.at(currentBranch)].stavka;
+             Node* node = new Node(line);
+             stog.push({node ,novoStanje});
+
+
+
             // Ovaj dio koda jos treba napravit.
             // Onda bu bilo rjeseno. Ovo dole se moze ignorirat vise manje.
 

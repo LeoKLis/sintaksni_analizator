@@ -64,6 +64,8 @@ public:
     map<int, vector<string>> stavke;
     vector<vector<Pair>> tablica;
 
+    vector<string> indexToSymbol;
+
     Deserializer();
     void printData();
 };

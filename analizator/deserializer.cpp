@@ -50,6 +50,14 @@ Deserializer::Deserializer()
     }
 
     file.close();
+
+
+    for(auto i:nezavrsniZnakovi)
+        indexToSymbol.push_back(i);
+    for(auto i: zavrsniZnakovi)
+        indexToSymbol.push_back(i);
+
+
 }
 
 void Deserializer::parseLine(vector<string>* arr, string line)
