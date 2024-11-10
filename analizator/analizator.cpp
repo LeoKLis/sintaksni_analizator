@@ -3,7 +3,6 @@
 
 int main(){
     Deserializer d;
-    d.printData();
-
-    // Simulator s;
+    Simulator s(d);
+    s.simulate();
 }
