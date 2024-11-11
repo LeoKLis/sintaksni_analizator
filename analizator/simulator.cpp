@@ -38,10 +38,9 @@ void Simulator::parseLine(string line, string* uniform, int* rowNum, string* lex
 
 void Simulator::simulate()
 {
-    string currentBranch;
     string uniform, lexUnit, line;
     int rowNum, spaceIndex;
-    ifstream file("../primjeri/primjeri/simplePpjLang_err.in");
+    ifstream file("../primjeri/primjeri/simplePpjLang_veci.in");
     getline(file, line);
     parseLine(line, &uniform, &rowNum, &lexUnit);
     bool prihvat = false;
@@ -49,7 +48,6 @@ void Simulator::simulate()
         Pair akcija = d.tablica[stog.top().second][d.symbolIndex[uniform]];
         if (akcija.action == pomakni) { // Ok
             Node* leaf = new Node(line);
-            currentBranch = stog.top().first->contents;
             stog.push({ leaf, akcija.stavka });
             if (getline(file, line)) {
                 parseLine(line, &uniform, &rowNum, &lexUnit);
@@ -91,60 +89,16 @@ void Simulator::simulate()
             pair<Node*, int> stogTop = stog.top();
             tree.markAsRoot(stogTop.first);
             prihvat = true;
-
         } else if (akcija.action == odbaci) {
-
-            int errorRowNum = rowNum;
-            vector<string> expected; //moguci simboli (koji ne bi izbacili pogresku)
-            for(int i =0; i<d.tablica.at(0).size(); i++){
-                    if(d.tablica[i][d.symbolIndex.at(currentBranch)].action != odbaci)
-                        expected.push_back(d.indexToSymbol.at(i));
-            }
-
-
-            cerr<<"Error at line "<<errorRowNum<<"; '"<<lexUnit<<"' is "<<uniform<<" instead of ";
-            for(int i=0; i<expected.size()-2; i++)
-                cerr<<expected.at(i)<<", ";
-            if(expected.size()>1){
-                cerr<<expected.at(1)<<" or "<<expected.at(0)<<endl;
-            }
-            else if(expected.size()==1) cerr<<expected.at(0)<<endl;
-
-
-            while(1==1){
-                parseLine(line, &uniform, &rowNum, &lexUnit);
-                if(find(d.sinkronizacijskiZnakovi.begin(),d.sinkronizacijskiZnakovi.end(), uniform) != d.sinkronizacijskiZnakovi.end())
+            while (true) {
+                if (find(d.sinkronizacijskiZnakovi.begin(), d.sinkronizacijskiZnakovi.end(), uniform) != d.sinkronizacijskiZnakovi.end())
                     break;
+                getline(file, line);
+                parseLine(line, &uniform, &rowNum, &lexUnit);
             }
-
-            while ((d.tablica[stog.top().second][d.symbolIndex[currentBranch]]).action != stavi) {
-                 stog.pop();
-             }
-             stog.pop();//mozda nepotrebno, ne znam
-             int novoStanje = d.tablica[stog.top().second][d.symbolIndex.at(currentBranch)].stavka;
-             Node* node = new Node(line);
-             stog.push({node ,novoStanje});
-
-
-
-            // Ovaj dio koda jos treba napravit.
-            // Onda bu bilo rjeseno. Ovo dole se moze ignorirat vise manje.
-
-            // cout << "Greska! Nes napravi! " << endl;
-            // while (d.tablica[stog.top().second][d.symbolIndex[currentBranch]].action != stavi) {
-            //     stog.pop();
-            // }
-            // while (find(d.sinkronizacijskiZnakovi.begin(), d.sinkronizacijskiZnakovi.end(), uniform) == d.sinkronizacijskiZnakovi.end()) {
-            //     if (!getline(file, line)) {
-            //         break;
-            //     }
-            //     parseLine(line, &uniform, &rowNum, &lexUnit);
-            // }
-            // cout << "Izaso.." << endl;
-            // Node* node = new Node(line);
-            // int checkNum = stog.top().second;
-            // int outNum = d.tablica[checkNum][d.symbolIndex[currentBranch]].stavka;
-            // stog.push({node, outNum});
+            while ((d.tablica[stog.top().second][d.symbolIndex[uniform]]).action == odbaci) {
+                stog.pop();
+            }
         }
     }
     file.close();
