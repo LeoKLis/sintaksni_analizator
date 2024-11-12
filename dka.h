@@ -33,33 +33,53 @@ enum Action {
 struct Pair {
     Action action;
     int stavka;
-    Pair(Action a, int b)
+    Pair(Action action, int stavka)
     {
-        action = a;
-        stavka = b;
+        this->action = action;
+        this->stavka = stavka;
+    }
+    Pair(int action, int stavka)
+    {
+        switch (action) {
+        case 0:
+            this->action = pomakni;
+            break;
+        case 1:
+            this->action = reduciraj;
+            break;
+        case 2:
+            this->action = prihvati;
+            break;
+        case 3:
+            this->action = stavi;
+            break;
+        default:
+            cout << "Ubacen krivi index. Nije dobro";
+            break;
+        }
+        this->stavka = stavka;
     }
 };
 
 class DKA {
 private:
-    map<set<int>, map<string, set<int>>> speedyCache;
     vector<StateDFA> structure;
     map<string, int> indexMapping;
 
-    void removeStateElement(StateDFA& state, int position);
+    void addProductionToState(StateDFA& base, StateNFA from);
+    void addTransitionToState(StateDFA& base, string symbol, set<int> lastEnv);
     void combineStates(StateDFA& base, StateDFA added);
-    void appendNfaToState(StateDFA& base, StateNFA from);
-    void appendEnvToState(StateDFA& base, string symbol, set<int> lastEnv);
-
-public:
-    DKA(NFA nfa, vector<string> nezavrsni, vector<string> zavrsni);
+    void removeStateElement(StateDFA& state, int position);
+    bool isAcceptState(StateDFA state);
 
     string stringifyProduction(string prodLeftSide, vector<string> prodRightSide, int dotIndex, set<string> starts);
     string stringifyTransition(set<int> transition);
-    bool isAcceptState(StateDFA state);
+public:
 
-    void print();
+
+    DKA(NFA nfa, vector<string> &nezavrsni, vector<string> &zavrsni);
     vector<vector<Pair>> getTable(map<int, vector<string>>& stavke, vector<string> nezavrsniZnakovi, vector<string> zavrsniZnakovi, map<string, int> symbolIndex);
+    void print();
 };
 
 #endif

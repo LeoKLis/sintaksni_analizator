@@ -6,7 +6,7 @@ ParserPravila::ParserPravila()
     int razmakIndex;
 
     // nezavrsni znakovi gramatike
-    // ifstream ulaz("primjeri/mini_primjer.txt");
+    // ifstream ulaz("primjeri/str152_primjer.txt");
     getline(cin, line);
     line = line.substr(line.find_first_of(' ') + 1);
     while ((razmakIndex = line.find_first_of(' ')) != string::npos) {

@@ -40,8 +40,8 @@ void Simulator::simulate()
 {
     string uniform, lexUnit, line;
     int rowNum, spaceIndex;
-    ifstream file("../primjeri/primjeri/simplePpjLang_veci.in");
-    getline(file, line);
+    // ifstream file("../primjeri/primjeri/simplePpjLang_veci.in");
+    getline(cin, line);
     parseLine(line, &uniform, &rowNum, &lexUnit);
     bool prihvat = false;
     while (!prihvat) {
@@ -49,7 +49,7 @@ void Simulator::simulate()
         if (akcija.action == pomakni) { // Ok
             Node* leaf = new Node(line);
             stog.push({ leaf, akcija.stavka });
-            if (getline(file, line)) {
+            if (getline(cin, line)) {
                 parseLine(line, &uniform, &rowNum, &lexUnit);
             } else {
                 line = "$";
@@ -76,7 +76,7 @@ void Simulator::simulate()
                 parseLine(stogTop.first->contents, &localUniform, &localRowNum, &localLexUnit);
                 if (localUniform != redux[i]) {
                     cout << "Greska! Nes se desilo! Gasim!" << endl;
-                    file.close();
+                    // cin.close();
                     return;
                 }
                 tree.connectNode(stogTop.first, node);
@@ -93,7 +93,7 @@ void Simulator::simulate()
             while (true) {
                 if (find(d.sinkronizacijskiZnakovi.begin(), d.sinkronizacijskiZnakovi.end(), uniform) != d.sinkronizacijskiZnakovi.end())
                     break;
-                getline(file, line);
+                getline(cin, line);
                 parseLine(line, &uniform, &rowNum, &lexUnit);
             }
             while ((d.tablica[stog.top().second][d.symbolIndex[uniform]]).action == odbaci) {
@@ -101,6 +101,6 @@ void Simulator::simulate()
             }
         }
     }
-    file.close();
+    // cin.close();
     tree.traverse();
 }
