@@ -104,7 +104,7 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
     int count = 0;
     for (auto it : nonFinalChars) {
         for (auto se : productions[it]) {
-            if (exists(se, string { "$" })) {
+            if (se.size() == 1 && exists(se, string { "$" })) {
                 emptyChars.push_back(count);
                 break;
             }
@@ -124,12 +124,17 @@ void NFA::build(vector<string> nonFinalChars, vector<string> finalChars, map<str
         }
     }
 
-    for (int i = 0; i < numNonFinal; i++) {
-        for (int j = 0; j < numChars; j++) {
-            if (startsWithChar[i][j] == 1) {
-                for (int k = 0; k < numChars; k++) {
-                    if (startsWithChar[j][k] == 1) {
-                        startsWithChar[i][k] = 1;
+    bool isModified = true;
+    while (isModified) {
+        isModified = false;
+        for (int i = 0; i < numNonFinal; i++) {
+            for (int j = 0; j < numChars; j++) {
+                if (startsWithChar[i][j] == 1) {
+                    for (int k = 0; k < numChars; k++) {
+                        if (startsWithChar[j][k] == 1 && startsWithChar[i][k] == 0) {
+                            startsWithChar[i][k] = 1;
+                            isModified = true;
+                        }
                     }
                 }
             }

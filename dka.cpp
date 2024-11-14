@@ -130,7 +130,6 @@ DKA::DKA(NFA nfa, vector<string>& nezavrsniZnakovi, vector<string>& zavrsniZnako
     }
     zavrsniZnakovi.push_back("$");
     nezavrsniZnakovi.insert(nezavrsniZnakovi.begin(), "inicijalno");
-    cout << structure.size() << endl;
 }
 
 bool DKA::isAcceptState(StateDFA state)
